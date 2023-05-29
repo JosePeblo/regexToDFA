@@ -1,71 +1,30 @@
-class node{
-    /**
-     * @param {number} vertex 
-     * @param {node} next 
-     */
-    constructor(vertex, next){
-        this.vertex = vertex
-        this.next = next;
-    }
-}
-class graph{
-    /**
-     * @param {number} vertex 
-     * @param {node} next 
-     */
-    constructor(vertex, next){
-        this.vertex = vertex
-        this.next = next;
-    }
-}
+const { readFileSync } = require('fs');
+const { inspect } = require('util');
+const { argv, exit } = require('process');
 
-class Pair {
-    constructor(first, second){
-        this[0] = first;
-        this[1] = second;
-    }
-}
+const regexToDFA = require('./automata');
 
-const alphabet = new Set('ab');
-const uOperators = new Set('*+');
-const oOperators = new Set('()|.');
-const expression = '(a|b)*abb';
+(() => {
+    let alphabet, regexp;
+    try {
+        const [alp, regx] = readFileSync(argv[2], 'utf-8').split('\r\n');
+        alphabet = new Set(alp);
+        regexp = regx;
 
-/**
- * @param {String} expr 
- */
-const transformExpression = (expr) => {
-    let transformed = '';
-    for(let i = 0; i < expr.length; i++){
-        const ele = expr[i];
-        const nel = expr[i+1]
-        transformed += ele;
-        if((alphabet.has(ele) || uOperators.has(ele)) && !oOperators.has(nel)){
-            transformed += '.';
+    } catch (err) {
+        switch (err.code){
+            case 'ERR_INVALID_ARG_TYPE':
+                console.log('No file entered, usage is:\n node index.js file.txt');
+                break;
+            case 'ENOENT':
+                console.log('The entered file is not found');
+                break;
         }
+        exit(1);
+
     }
-    return transformed;
-}
 
-/**
- * @param {String} expr 
- */
-const createGraph = (expr) => {
-    const exp = transformExpression(expr);
-    const operatorQueue = new Array();
-    const operandQueue = new Array();
+    const graph = regexToDFA(alphabet, regexp);
 
-    for(let i = 0; i < expr.length; i++){
-        const ele = expr[i];
-        
-    }
-}
-
-// createGraph(expression)
-
-const adjacencyList = new Map();
-
-adjacencyList.set('hola', new Pair());
-
-console.log(adjacencyList);
-
+    console.log(inspect(graph, false, null, true));
+})();
