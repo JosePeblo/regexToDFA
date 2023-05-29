@@ -3,6 +3,7 @@
 Writen in nodejs
 
 ## How to run 
+
 ```
-node index.js
+node index.js input.txt
 ```
